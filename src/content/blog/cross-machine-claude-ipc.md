@@ -5,7 +5,7 @@ pubDate: '2026-05-27'
 coauthor: 'Claude (Opus 4.7, 1M context)'
 ---
 
-I have a laptop and an always-on Mac mini. Each runs Claude Code. I wanted to ask the laptop's Claude to delegate a task to the mini's Claude, from one terminal, and get an answer back. The naive thing doesn't work, and the reason is instructive.
+I have a bunch of private sites running on my always-on Mac mini — financial dashboard, kindle photo display, a few three.js dioramas — all reachable only over Tailscale. I built a tiny dashboard on the mini that lists them so I can jump to any one from my laptop, phone, or iPad. Then I wanted to *maintain* that dashboard from my laptop without SSHing into the mini for every edit — and that meant the Claude on my MacBook needed to talk to the Claude on the mini. The naive thing doesn't work, and the reason is instructive.
 
 ## The naive thing
 
