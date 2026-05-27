@@ -20,20 +20,23 @@
 	color-scheme: light dark;
 }
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		--accent: #79b8ff;
-		--accent-dark: #58a6ff;
-		--black: 230, 237, 243;        /* near-white headings */
-		--gray: 139, 148, 158;         /* medium gray for muted text */
-		--gray-light: 48, 54, 61;      /* surface/borders/code-bg */
-		--gray-dark: 201, 209, 217;    /* body text */
-		--bg-page: #0d1117;
-		--bg-elevated: #161b22;
-		--box-shadow:
-			0 2px 6px rgba(0, 0, 0, 40%), 0 8px 24px rgba(0, 0, 0, 50%),
-			0 16px 32px rgba(0, 0, 0, 50%);
-	}
+/* Dark mode is opt-in via a `.dark` class on <html>. An inline script in
+   BaseHead applies that class before first paint based on localStorage(theme)
+   with a fallback to prefers-color-scheme: dark, so JS-disabled visitors get
+   only light mode (acceptable for a personal blog). The toggle in Header
+   flips the class and persists the choice. */
+.dark {
+	--accent: #79b8ff;
+	--accent-dark: #58a6ff;
+	--black: 230, 237, 243;        /* near-white headings */
+	--gray: 139, 148, 158;         /* medium gray for muted text */
+	--gray-light: 48, 54, 61;      /* surface/borders/code-bg */
+	--gray-dark: 201, 209, 217;    /* body text */
+	--bg-page: #0d1117;
+	--bg-elevated: #161b22;
+	--box-shadow:
+		0 2px 6px rgba(0, 0, 0, 40%), 0 8px 24px rgba(0, 0, 0, 50%),
+		0 16px 32px rgba(0, 0, 0, 50%);
 }
 body {
 	font-family: var(--font-atkinson);
@@ -143,16 +146,14 @@ hr {
 	}
 }
 
-/* Shiki dual-theme: toggle to the dark theme when the user prefers dark mode. */
-@media (prefers-color-scheme: dark) {
-	.astro-code,
-	.astro-code span {
-		color: var(--shiki-dark) !important;
-		background-color: var(--shiki-dark-bg) !important;
-		font-style: var(--shiki-dark-font-style) !important;
-		font-weight: var(--shiki-dark-font-weight) !important;
-		text-decoration: var(--shiki-dark-text-decoration) !important;
-	}
+/* Shiki dual-theme: toggle to the dark theme when <html> has the .dark class. */
+.dark .astro-code,
+.dark .astro-code span {
+	color: var(--shiki-dark) !important;
+	background-color: var(--shiki-dark-bg) !important;
+	font-style: var(--shiki-dark-font-style) !important;
+	font-weight: var(--shiki-dark-font-weight) !important;
+	text-decoration: var(--shiki-dark-text-decoration) !important;
 }
 
 .sr-only {

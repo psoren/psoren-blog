@@ -55,3 +55,17 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image.src, Astro.url)} />
+
+<!-- Apply dark class before paint so there's no flash of unstyled theme.
+     Honors localStorage('theme') if set, otherwise falls back to OS preference. -->
+<script is:inline>
+	(function () {
+		try {
+			var saved = localStorage.getItem('theme');
+			var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+			if (saved === 'dark' || (saved == null && sysDark)) {
+				document.documentElement.classList.add('dark');
+			}
+		} catch (e) {}
+	})();
+</script>
