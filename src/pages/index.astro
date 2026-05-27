@@ -92,7 +92,7 @@ const base = import.meta.env.BASE_URL;
 							<a href={`${base}blog/${post.id}/`}>
 								<span class="date">
 									<FormattedDate date={post.data.pubDate} />
-									{post.data.coauthor && <span class="ai-tag" title={`Drafted with ${post.data.coauthor}`}>AI</span>}
+									{post.data.coauthor && <span class="ai-tag" title={`Written by ${post.data.coauthor}`}>AI</span>}
 								</span>
 								<span class="title">{post.data.title}</span>
 								<p class="description">{post.data.description}</p>
