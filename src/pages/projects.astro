@@ -1,0 +1,85 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+
+const base = import.meta.env.BASE_URL;
+
+const projects = [
+	{
+		name: 'Particles',
+		href: `${base}particles/`,
+		blurb: 'A small canvas-based particle animation. Vanilla JS, no deps.',
+	},
+	{
+		name: 'PlanetGenerator (simplexplanet)',
+		href: 'https://psoren.github.io/simplexplanet/',
+		blurb: 'A 3D procedural planet generator built on simplex noise.',
+	},
+	{
+		name: 'Site registry',
+		href: 'https://github.com/psoren/parker-site-registry',
+		blurb: 'A dashboard listing every site I run — public-deployed, Mac mini hosted, and local-dev. Source is also home to the MBP↔mini Claude bridge.',
+	},
+];
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Projects — ${SITE_TITLE}`} description="A few small things I've built and put online." />
+		<style>
+			.intro {
+				margin-bottom: 2em;
+			}
+			ul.projects {
+				list-style: none;
+				padding: 0;
+			}
+			ul.projects li {
+				padding: 1.25em 0;
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+			ul.projects li:last-child {
+				border-bottom: none;
+			}
+			ul.projects a {
+				font-size: 1.3em;
+				font-weight: 600;
+				color: rgb(var(--black));
+				text-decoration: none;
+			}
+			ul.projects a:hover {
+				text-decoration: underline;
+				color: var(--accent);
+			}
+			ul.projects .blurb {
+				margin: 0.3em 0 0;
+				color: rgb(var(--gray));
+				font-size: 0.95em;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="intro">
+				<h1>Projects</h1>
+				<p>A handful of small things I've put on the web. The blog itself is where I write about them.</p>
+			</section>
+
+			<ul class="projects">
+				{
+					projects.map((p) => (
+						<li>
+							<a href={p.href}>{p.name}</a>
+							<p class="blurb">{p.blurb}</p>
+						</li>
+					))
+				}
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>
