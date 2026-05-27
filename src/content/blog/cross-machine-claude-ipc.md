@@ -70,3 +70,14 @@ The interesting part isn't the SSH plumbing — it's the new primitive. With `as
 The right interface between two agents on two machines is *not* a shared chat window or a synced state file. It's the boring, decades-old one: **delegation through plain shell, stdin/stdout, no protocol**. The IPC layer doesn't need to be smart. The agents on either end are.
 
 Source: [psoren/claude-bridge](https://github.com/psoren/claude-bridge).
+
+## Postscript: prior art
+
+After publishing this, a web search turned up two existing projects with overlapping goals that predate mine:
+
+- **[willjackson/claude-code-bridge](https://github.com/willjackson/claude-code-bridge)** — same name, WebSocket-based, supports file operations as well as prompt delegation. More elaborate than mine.
+- **[rohitg00/tailclaude](https://github.com/rohitg00/tailclaude)** — Claude Code on your Tailnet, with OTel tracing and shared task state. The closest geographic match to my stack.
+
+Both also wrap the `claude` CLI, so they inherit OAuth/Keychain auth the same way mine does (a claim I incorrectly made about mine being distinctive — fixed in the bridge repo's README).
+
+I left mine standing anyway because the architecture is genuinely smaller — 75 lines of Python plus a 25-line bash CLI, no protocol, no auth tokens, no external dependencies — and because the specific Keychain workaround (born-in-GUI daemon, SSH never touches `claude`) is a different shape than the typical "configure SSH to unlock the keychain" solution. Whether that's worth a separate project or just a footnote on the others is a judgment call. The writeup is probably more useful than the daemon itself.
