@@ -7,7 +7,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://psoren.github.io',
-	base: '/psoren-blog',
+	base: '/psoren-blog/',
 	integrations: [mdx(), sitemap()],
 	fonts: [
 		{

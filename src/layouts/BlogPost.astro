@@ -8,7 +8,7 @@ import Header from '../components/Header.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, coauthor } = Astro.props;
 ---
 
 <html lang="en">
@@ -52,6 +52,17 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			.last-updated-on {
 				font-style: italic;
 			}
+			.coauthor {
+				display: inline-block;
+				margin-top: 0.4em;
+				padding: 0.25em 0.6em;
+				border-radius: 999px;
+				border: 1px solid rgb(var(--gray-light));
+				background: rgba(var(--gray-light), 0.4);
+				color: rgb(var(--gray));
+				font-size: 0.8em;
+				font-style: italic;
+			}
 		</style>
 	</head>
 
@@ -75,6 +86,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 							}
 						</div>
 						<h1>{title}</h1>
+						{coauthor && <div class="coauthor" title="This post was drafted by an AI collaborator and edited by Parker.">Drafted with {coauthor}</div>}
 						<hr />
 					</div>
 					<slot />

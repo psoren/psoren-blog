@@ -14,6 +14,10 @@ const blog = defineCollection({
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: z.optional(image()),
+			// Optional collaborator credit — when set, rendered as a byline under the title.
+			// Convention: the blog-post skill sets this to 'Claude (Opus 4.7, 1M context)'
+			// for any post it drafted, so AI-drafted content is visibly disclosed.
+			coauthor: z.string().optional(),
 		}),
 });
 

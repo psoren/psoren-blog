@@ -2,6 +2,7 @@
 title: 'Cross-machine Claude IPC: a bridge between my MBP and my Mac mini'
 description: 'How to get the Claude on your laptop to talk to the Claude on your always-on Mac mini, over Tailscale, without losing your mind to macOS Keychain.'
 pubDate: '2026-05-27'
+coauthor: 'Claude (Opus 4.7, 1M context)'
 ---
 
 I have two Macs that matter to me. A MacBook Pro that goes everywhere, and a Mac mini that sits at home, plugged in, always on, doing low-stakes long-running stuff — financial dashboards, hue automation, scrapers. Each runs Claude Code. Until this week they were islands.
