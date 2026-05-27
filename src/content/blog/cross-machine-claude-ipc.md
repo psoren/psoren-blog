@@ -68,3 +68,5 @@ Each of these cost me 10–30 minutes. Saving for the next person, probably futu
 The interesting part isn't the SSH plumbing — it's the new primitive. With `ask-mini` in `$PATH`, any script on the laptop can commission work on the always-on machine. Skills, cron jobs, other agents. The mini becomes a *callable resource*, not a place I have to log into.
 
 The right interface between two agents on two machines is *not* a shared chat window or a synced state file. It's the boring, decades-old one: **delegation through plain shell, stdin/stdout, no protocol**. The IPC layer doesn't need to be smart. The agents on either end are.
+
+Source: [psoren/claude-bridge](https://github.com/psoren/claude-bridge).
