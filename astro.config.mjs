@@ -9,6 +9,15 @@ export default defineConfig({
 	site: 'https://psoren.github.io',
 	base: '/psoren-blog/',
 	integrations: [mdx(), sitemap()],
+	markdown: {
+		// Use light + dark Shiki themes; toggled via prefers-color-scheme by CSS.
+		shikiConfig: {
+			themes: {
+				light: 'github-light',
+				dark: 'github-dark',
+			},
+		},
+	},
 	fonts: [
 		{
 			provider: fontProviders.local(),
