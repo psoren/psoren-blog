@@ -1,29 +1,27 @@
 ---
-title: "Reading code in cmux: compose the primitive, don't fork the app"
-description: "cmux shows source files as plain text. Instead of patching the app, I built a 200-line tool that hands a Shiki-highlighted URL to its own `cmux open` command — with live reload."
+title: 'Syntax-highlighted code files in cmux'
+description: "cmux shows source files as plain text. This is a ~200-line tool that highlights a file with Shiki and opens it in cmux's browser via the cmux open command, with live reload on change."
 pubDate: '2026-06-03'
 coauthor: 'Claude (Opus 4.8, 1M context)'
 ---
 
-I live in [cmux](https://github.com/manaflow-ai/cmux) — a Ghostty-based terminal that stacks my agent sessions in vertical tabs. It renders Markdown beautifully and diffs with full syntax highlighting. But click a plain `.ts` file and you get flat, uncolored monospace. I kept bouncing to WebStorm just to *read* a file, which is a silly reason to leave the window I'm already in.
-
-The fix turned out not to need a fork.
+[cmux](https://github.com/manaflow-ai/cmux) is a Ghostty-based terminal that stacks my agent sessions in vertical tabs. It renders Markdown and highlights diffs, but a plain `.ts` file opens as uncolored monospace, so I was switching to WebStorm just to read code. cmux is open source and exposes enough of a CLI to fix this without modifying the app.
 
 ![ccode rendering a TypeScript file in cmux](/psoren-blog/ccode/screenshot-dark.png)
 
-## The recon
+## What cmux exposes
 
-cmux is open source (GPL, native Swift/AppKit), so I went spelunking in the app bundle. Three facts decided the design:
+cmux is GPL, native Swift/AppKit. Three things in the app bundle determined the design:
 
-- It has **two preview surfaces**: a Markdown tab (an HTML webview, highlighted with highlight.js) and a generic *file preview tab* — a native plain-text view. Code lands in the second one. That's the flat text.
-- It **already bundles Shiki** — the diff viewer ships 350+ language grammars and an oniguruma wasm worker. The highlighter I wanted was *already in the app*, just not wired to single files.
-- There is **no plugin API**. The README is blunt about the philosophy: cmux is "a primitive, not a solution." It exposes a CLI and a Unix socket and expects you to compose.
+- It has two preview surfaces: a Markdown tab (an HTML webview, highlighted with highlight.js) and a generic file preview tab — a native plain-text view. Code lands in the second one.
+- It already bundles Shiki. The diff viewer ships 350+ language grammars and an oniguruma wasm worker. The highlighter was already in the app, just not wired to single files.
+- There is no plugin API. The README states the philosophy: cmux is "a primitive, not a solution." It exposes a CLI and a Unix socket and expects you to compose.
 
-So the obvious move — patch the native file-preview tab to call the bundled Shiki — is a trap. It means building the Swift app, and cmux auto-updates, so every release would wipe the patch. A fork you have to re-apply forever isn't a fix.
+Patching the native file-preview tab to call the bundled Shiki would mean building the Swift app, and cmux auto-updates, so every release would overwrite the patch.
 
-## Compose the primitive
+## The approach
 
-`cmux open` takes a URL and renders it in cmux's in-app browser. That's the whole opening. Don't touch the app — render the file *yourself* and hand cmux a link:
+`cmux open` takes a URL and renders it in cmux's in-app browser. So instead of touching the app, a local server renders the file and cmux opens the link:
 
 ```bash
 ccode src/server.mjs
@@ -31,7 +29,7 @@ ccode src/server.mjs
 #  └─ cmux open "http://127.0.0.1:8765/view?path=/abs/src/server.mjs"
 ```
 
-The server reads the file, highlights it with Shiki (auto light/dark, line numbers, language detection), and serves an HTML page. cmux opens it as a normal browser tab. ~200 lines of Node, zero modification to cmux, survives every update. The whole thing is [psoren/cmux-code-viewer](https://github.com/psoren/cmux-code-viewer).
+The server reads the file, highlights it with Shiki (auto light/dark, line numbers, language detection), and serves an HTML page. cmux opens it as a normal browser tab. It's ~200 lines of Node and changes nothing in the app, so it keeps working across cmux updates. Source: [psoren/cmux-code-viewer](https://github.com/psoren/cmux-code-viewer).
 
 ```
 ccode foo.ts
@@ -43,16 +41,14 @@ ccode foo.ts
                   └─ /events    → SSE: server watches the file
 ```
 
-## Live reload, because an agent is editing the file
+## Live reload
 
-The view I'm reading is often a file an agent is *actively rewriting*. So the server watches it — watching the parent directory, not the inode, since editors and agents replace files via rename — and pushes a one-line Server-Sent Event on change. The page refetches the highlighted fragment and swaps it in place, preserving scroll. No reload, no flicker.
+The file being viewed is often one an agent is rewriting, so the server watches it and pushes a Server-Sent Event on each change. The page refetches the highlighted fragment and swaps it in place, preserving scroll position.
 
 ![live reload as the file changes on disk](/psoren-blog/ccode/demo.gif)
 
-That directory-watch detail is the one real gotcha: a naive `fs.watch` on the file path goes deaf the moment something does a write-to-temp-then-rename, which is most tools.
+It watches the parent directory rather than the file path. Editors and agents usually replace a file by writing a temp file and renaming it over the original, which a watch bound to the original path misses.
 
-## It'll probably be native someday
+## cmux is adding this natively
 
-The honest footnote: cmux is *already building* this. There's an in-progress [file-browser + editor panel](https://github.com/manaflow-ai/cmux/pull/1909) with Highlightr, a ["code viewer tab type" discussion](https://github.com/manaflow-ai/cmux/discussions/849), and a [file-preview render request](https://github.com/manaflow-ai/cmux/issues/1311). It's just not in my installed build yet (I checked the binary — no Highlightr). When it ships, this becomes redundant for casual reading. I'm fine with that.
-
-The takeaway isn't the tool, it's the reflex: when something exposes a primitive as small as "open this URL," you can almost always compose the feature you want from the outside instead of forking your way in. The composed version is smaller, and it doesn't fight the next update.
+cmux has in-progress work for the same thing: a file-browser and editor panel using Highlightr ([PR #1909](https://github.com/manaflow-ai/cmux/pull/1909)), a ["code viewer tab type" discussion](https://github.com/manaflow-ai/cmux/discussions/849), and a [file-preview render request](https://github.com/manaflow-ai/cmux/issues/1311). It isn't in my installed build yet — the binary has no Highlightr strings. When it ships, this tool stops being necessary for casual reading. Until then it covers the gap, and because it depends only on `cmux open`, it doesn't break on update.

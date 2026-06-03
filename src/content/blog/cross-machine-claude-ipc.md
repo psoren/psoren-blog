@@ -1,13 +1,13 @@
 ---
 title: 'Cross-machine Claude IPC: a bridge between my MBP and my Mac mini'
-description: 'How to get the Claude on your laptop to talk to the Claude on your always-on Mac mini, over Tailscale, without losing your mind to macOS Keychain.'
+description: 'Getting Claude Code on a laptop to run Claude Code on an always-on Mac mini over Tailscale, and the macOS login-Keychain problem that blocks the obvious approach.'
 pubDate: '2026-05-27'
 coauthor: 'Claude (Opus 4.7, 1M context)'
 ---
 
-I have a bunch of private sites running on my always-on Mac mini — financial dashboard, kindle photo display, a few three.js dioramas — all reachable only over Tailscale. I built a tiny dashboard on the mini that lists them so I can jump to any one from my laptop, phone, or iPad. Then I wanted to *maintain* that dashboard from my laptop without SSHing into the mini for every edit — and that meant the Claude on my MacBook needed to talk to the Claude on the mini. The naive thing doesn't work, and the reason is instructive.
+I have a bunch of private sites running on my always-on Mac mini — financial dashboard, kindle photo display, a few three.js dioramas — all reachable only over Tailscale. I built a tiny dashboard on the mini that lists them so I can jump to any one from my laptop, phone, or iPad. Then I wanted to *maintain* that dashboard from my laptop without SSHing into the mini for every edit — and that meant the Claude on my MacBook needed to talk to the Claude on the mini. The naive approach doesn't work, because of how the macOS login Keychain is scoped.
 
-## The naive thing
+## The naive approach
 
 ```bash
 ssh parkers-mac-mini 'claude -p "what is your hostname?"'
@@ -55,7 +55,7 @@ Running on `Parkers-Mac-mini.local`.
 
 ## Gotchas worth saving
 
-Each of these cost me 10–30 minutes. Saving for the next person, probably future-me.
+Each of these cost me 10–30 minutes.
 
 - **Mac App Store Tailscale** can't run a Tailscale-SSH server (sandbox). Fall back to regular `sshd` with key auth.
 - **Key offered, server accepts, "Permission denied"** = passphrased private key + nothing to type into. Either `ssh-add --apple-use-keychain` it once, or use a fresh passphrase-less key.
@@ -63,11 +63,9 @@ Each of these cost me 10–30 minutes. Saving for the next person, probably futu
 - **Keychain ACL ≠ unlocked Keychain.** ACL controls *which apps*; unlock controls *whether at all*. The first doesn't imply the second.
 - **LaunchAgents have a minimal PATH.** Without an `EnvironmentVariables` block, `claude` is "not found" even when installed. Add every plausible install dir explicitly.
 
-## The takeaway
+## What this enables
 
-The interesting part isn't the SSH plumbing — it's the new primitive. With `ask-mini` in `$PATH`, any script on the laptop can commission work on the always-on machine. Skills, cron jobs, other agents. The mini becomes a *callable resource*, not a place I have to log into.
-
-The right interface between two agents on two machines is *not* a shared chat window or a synced state file. It's the boring, decades-old one: **delegation through plain shell, stdin/stdout, no protocol**. The IPC layer doesn't need to be smart. The agents on either end are.
+With `ask-mini` in `$PATH`, any script on the laptop can run work on the always-on machine — skills, cron jobs, other agents. The mini becomes a callable resource rather than a host I log into. The interface is plain shell: stdin/stdout over SSH, with no protocol and no auth tokens beyond the SSH key.
 
 Source: [psoren/claude-bridge](https://github.com/psoren/claude-bridge).
 
