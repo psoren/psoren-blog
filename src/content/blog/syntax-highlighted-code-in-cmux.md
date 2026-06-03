@@ -1,21 +1,21 @@
 ---
 title: 'Syntax-highlighted code files in cmux'
-description: "cmux shows source files as plain text. This is a ~200-line tool that highlights a file with Shiki and opens it in cmux's browser via the cmux open command, with live reload on change."
+description: "cmux shows source files as plain text. cmux-code-viewer is a ~200-line tool that highlights a file with Shiki and opens it in cmux's browser via the cmux open command, with live reload on change."
 pubDate: '2026-06-03'
 coauthor: 'Claude (Opus 4.8, 1M context)'
 ---
 
-[cmux](https://github.com/manaflow-ai/cmux) is a Ghostty-based terminal that stacks my agent sessions in vertical tabs. It renders Markdown and highlights diffs, but a plain `.ts` file opens as uncolored monospace, so I was switching to WebStorm just to read code. cmux is open source and exposes enough of a CLI to fix this without modifying the app.
+[cmux](https://github.com/manaflow-ai/cmux) is a Ghostty-based terminal that stacks agent sessions in vertical tabs. It renders Markdown and highlights diffs, but a plain `.ts` file opens as uncolored monospace, so reading code means switching to a separate editor. cmux is open source and exposes enough of a CLI to fix this without modifying the app.
 
 ![ccode rendering a TypeScript file in cmux](/psoren-blog/ccode/screenshot-dark.png)
 
 ## What cmux exposes
 
-cmux is GPL, native Swift/AppKit. Three things in the app bundle determined the design:
+cmux is GPL, native Swift/AppKit. Three things in the app bundle determine the design:
 
 - It has two preview surfaces: a Markdown tab (an HTML webview, highlighted with highlight.js) and a generic file preview tab — a native plain-text view. Code lands in the second one.
-- It already bundles Shiki. The diff viewer ships 350+ language grammars and an oniguruma wasm worker. The highlighter was already in the app, just not wired to single files.
-- There is no plugin API. The README states the philosophy: cmux is "a primitive, not a solution." It exposes a CLI and a Unix socket and expects you to compose.
+- It already bundles Shiki. The diff viewer ships 350+ language grammars and an oniguruma wasm worker. The highlighter is already in the app, just not wired to single files.
+- There is no plugin API. The README states the philosophy: cmux is "a primitive, not a solution." It exposes a CLI and a Unix socket and expects composition.
 
 Patching the native file-preview tab to call the bundled Shiki would mean building the Swift app, and cmux auto-updates, so every release would overwrite the patch.
 
@@ -51,4 +51,4 @@ It watches the parent directory rather than the file path. Editors and agents us
 
 ## cmux is adding this natively
 
-cmux has in-progress work for the same thing: a file-browser and editor panel using Highlightr ([PR #1909](https://github.com/manaflow-ai/cmux/pull/1909)), a ["code viewer tab type" discussion](https://github.com/manaflow-ai/cmux/discussions/849), and a [file-preview render request](https://github.com/manaflow-ai/cmux/issues/1311). It isn't in my installed build yet — the binary has no Highlightr strings. When it ships, this tool stops being necessary for casual reading. Until then it covers the gap, and because it depends only on `cmux open`, it doesn't break on update.
+cmux has in-progress work for the same thing: a file-browser and editor panel using Highlightr ([PR #1909](https://github.com/manaflow-ai/cmux/pull/1909)), a ["code viewer tab type" discussion](https://github.com/manaflow-ai/cmux/discussions/849), and a [file-preview render request](https://github.com/manaflow-ai/cmux/issues/1311). It isn't in the current released build yet — that binary has no Highlightr strings. When it ships, this tool stops being necessary for casual reading. Until then it covers the gap, and because it depends only on `cmux open`, it doesn't break on update.
